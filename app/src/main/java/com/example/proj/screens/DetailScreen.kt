@@ -11,9 +11,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.foundation.layout.Row
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.platform.LocalContext
+import android.content.Intent
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -66,20 +70,50 @@ fun DetailScreen(cryptoId: Int, viewModel: CryptoViewModel, modifier: Modifier =
                     style = MaterialTheme.typography.headlineLarge
             )
 
+
             Spacer(modifier = Modifier.height(16.dp))
 
-            IconButton(
+            val context = LocalContext.current
+            val price = crypto.quote["USD"]?.price ?: 0.0
+            val formattedPrice = String.format("%.2f", price)
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                IconButton(
                     onClick = { viewModel.toggleFavorite(crypto) },
                     modifier = Modifier.size(64.dp)
-            ) {
-                Icon(
+                ) {
+                    Icon(
                         imageVector =
                                 if (isFavorite) Icons.Filled.Favorite
                                 else Icons.Outlined.FavoriteBorder,
                         contentDescription = "Favorite",
                         tint = if (isFavorite) Color.Red else Color.Gray,
                         modifier = Modifier.size(48.dp)
-                )
+                    )
+                }
+
+                IconButton(
+                    onClick = {
+                        val sendIntent = Intent().apply {
+                            action = Intent.ACTION_SEND
+                            putExtra(Intent.EXTRA_TEXT, "${crypto.name} is at $$formattedPrice")
+                            type = "text/plain"
+                        }
+                        val shareIntent = Intent.createChooser(sendIntent, "Share Coin Price")
+                        context.startActivity(shareIntent)
+                    },
+                    modifier = Modifier.size(64.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.Share,
+                        contentDescription = "Share",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(48.dp)
+                    )
+                }
             }
         }
     } else {
