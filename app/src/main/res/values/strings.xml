@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">proj</string>
+    <string name="home">Home</string>
+    <string name="favorite">Favorite</string>
+    <string name="detail">Detail</string>
+    <string name="back_button">Back</string>
+</resources>
